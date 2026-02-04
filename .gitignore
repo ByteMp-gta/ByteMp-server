@@ -12,7 +12,7 @@
 build/
 saida.txt
 # Package Files #
-*.jar
+
 *.war
 *.nar
 *.ear

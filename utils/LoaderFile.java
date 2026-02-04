@@ -14,7 +14,7 @@ public class LoaderFile {
         }
 
         if (!Files.exists(filePath)) {
-            throw new IllegalArgumentException("The specified file does not exist.");
+           RunLuaServer.run();
         }
 
         try {
