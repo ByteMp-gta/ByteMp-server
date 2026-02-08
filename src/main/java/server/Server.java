@@ -6,10 +6,9 @@ import java.net.DatagramSocket;
 import java.util.HashSet;
 import java.util.Set;
 
-import main.java.filter.events.OnPlayerEnter;
-import utils.LoaderFile;
+import main.java.filter.Filter;
 import utils.Player;
-import java.net.InetAddress;
+;
 
 public class Server {
 
@@ -30,7 +29,7 @@ public class Server {
             return true;
 
         } catch (Exception e) {
-
+            System.out.println(e.getMessage());
             return false;
         }
 
@@ -56,31 +55,7 @@ public class Server {
 
             System.out.println("Recebido: " + mensagem);
 
-            if (mensagem.contains("EU:")) {
-                System.out.println("passou");
-                clients.add(new Player(packet.getSocketAddress(), mensagem));
-
-                String nomeJogador = mensagem.substring(3);
-
-                try {
-                    DatagramSocket forward = new DatagramSocket();
-                    InetAddress addr = InetAddress.getByName("127.0.0.1");
-
-                  
-                    String forwardMsg = "EU:" + nomeJogador;
-                    byte[] fdata = forwardMsg.getBytes();
-                    DatagramPacket fpacket = new DatagramPacket(fdata, fdata.length, addr, LoaderFile.loadIntPort("saida.txt"));
-                    System.out.println("Enviando pacote para " + addr + ":" + LoaderFile.loadIntPort("saida.txt")   );
-                    forward.send(fpacket);
-
-                    forward.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                OnPlayerEnter onPlayerEnter = new OnPlayerEnter(clients, socket);
-                onPlayerEnter.sendEvent(nomeJogador);
-            }
+            Filter.start(mensagem, packet, clients, socket);
 
             String resposta = "Echo: " + mensagem;
             byte[] respostaBytes = resposta.getBytes();

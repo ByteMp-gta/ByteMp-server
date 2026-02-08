@@ -19,7 +19,7 @@ public:
     void addEvent(const char* str);
     void registerCallback(const std::string& name, int ref);
     bool runScript(const std::string& path);
-    void triggerEvent(const char* str, const std::string& player);
+    void onPlayerDamage(const std::string&player, const float damage);
 private:
     lua_State* L;
     std::map<std::string, int> callbacks;

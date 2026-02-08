@@ -35,9 +35,11 @@ using socket_t = int;
 #define SERVER_IP "127.0.0.1"
 #define PORT 8080
 #include "../cpp/LuaEngine.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
+#include <sstream> 
+#include <vector>
 enum Event
 {
     EU,
@@ -60,12 +62,13 @@ public:
         : port(port), ip_server(ip_server), name_user(name_user)
     {
     }
-    void savePort(int port){
-    std::string nomeArquivo = "saida.txt";
-    std::ofstream arquivo(nomeArquivo);
-    arquivo << port;
-    arquivo.close();
-}
+    void savePort(int port)
+    {
+        std::string nomeArquivo = "saida.txt";
+        std::ofstream arquivo(nomeArquivo);
+        arquivo << port;
+        arquivo.close();
+    }
     bool conecttionServer()
     {
 
@@ -88,7 +91,6 @@ public:
         servaddr.sin_family = AF_INET;
         servaddr.sin_port = htons(port);
 
-       
         if (inet_pton(AF_INET, ip_server.c_str(), &servaddr.sin_addr) <= 0)
         {
             std::cerr << "IP inválido\n";
@@ -96,7 +98,8 @@ public:
             return false;
         }
 
-        if (bind(sockfd, (sockaddr *)&servaddr, sizeof(servaddr)) == SOCKET_ERROR) {
+        if (bind(sockfd, (sockaddr *)&servaddr, sizeof(servaddr)) == SOCKET_ERROR)
+        {
             std::cerr << "Falha ao bindar socket\n";
             closesocket(sockfd);
             return false;
@@ -115,7 +118,7 @@ public:
         sendto(sockfd, msg, (int)strlen(msg), 0,
                (sockaddr *)&servaddr, sizeof(servaddr));
     }
-    void listenEvents(LuaEngine* eventP)
+    void listenEvents(LuaEngine *eventP)
     {
         char buffer[1024];
         sockaddr_in from{};
@@ -131,21 +134,34 @@ public:
                 buffer[bytes] = '\0';
                 std::string msg(buffer);
 
-                size_t sep = msg.find(':');
-                std::string event = (sep != std::string::npos) ? msg.substr(0, sep) : msg;
-                std::string player = (sep != std::string::npos) ? msg.substr(sep + 1) : "unknown";
-
-                if (event == "EU")
+                
+                std::stringstream ss(msg);
+                std::string token;
+                std::vector<std::string> parts;
+                while (std::getline(ss, token, ':'))
                 {
-                    eventP->triggerEvent("OnPlayerEntered", player);
+                    parts.push_back(token);
+                }
+                std::string event = parts[0];
+                
+
+                if (event == "onPlayerDamage")
+                {
+                    if (parts.size() == 4)
+                    {
+                        
+                        std::string nome = parts[1];
+                        std::string label = parts[2];
+                        float dano = std::stof(parts[3]);
+                        eventP->onPlayerDamage(nome,dano);
+                    }
+                    
                 }
                 else if (event == "SAI")
                 {
-                    
                 }
                 else if (event == "SLA")
                 {
-                   
                 }
             }
         }
