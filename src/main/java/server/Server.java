@@ -57,20 +57,8 @@ public class Server {
 
             Filter.start(mensagem, packet, clients, socket);
 
-            String resposta = "Echo: " + mensagem;
-            byte[] respostaBytes = resposta.getBytes();
-
-            DatagramPacket respostaPacket = new DatagramPacket(
-                    respostaBytes,
-                    respostaBytes.length,
-                    packet.getAddress(),
-                    packet.getPort());
-            try {
-                socket.send(respostaPacket);
-            } catch (IOException e) {
-                System.out.println("deu bom nao");
-                System.exit(1);
-            }
+            
+           
 
         }
 
